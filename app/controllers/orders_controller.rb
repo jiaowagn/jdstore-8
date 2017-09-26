@@ -13,6 +13,8 @@ class OrdersController < ApplicationController
         product_list.product_quantity = cart_item.quantity
         product_list.save
       end
+      current_cart.clean!
+      OrderMailer.notify_order_placed(@order).deliver!
       redirect_to order_path(@order.token)
     else
       render "carts/checkout"
@@ -36,7 +38,7 @@ class OrdersController < ApplicationController
     @order.set_payment_with!("wechat")
     @order.pay!
     redirect_to :back, notice: "使用微信付款成功"
-  end 
+  end
 
   private
   def order_params
